@@ -115,6 +115,14 @@ public class Task {
         this.creationTimestamp = creationTimestamp;
     }
 
+    public long getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public long getProjectId() {
+        return projectId;
+    }
+
     /**
      * Comparator to sort task from A to Z
      */
