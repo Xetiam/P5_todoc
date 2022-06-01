@@ -18,3 +18,20 @@ class MainStateWithTasks extends MainState {
 }
 class MainStateWithNoTasks extends MainState {
 }
+class MainStateOnCreate extends MainState {
+    private Boolean isOnError;
+    private DialogDismissCallBack callBack;
+
+    MainStateOnCreate(Boolean isOnError, DialogDismissCallBack callBack){
+        this.isOnError = isOnError;
+        this.callBack = callBack;
+    }
+
+    public Boolean getOnError() {
+        return isOnError;
+    }
+
+    public DialogDismissCallBack getCallBack() {
+        return callBack;
+    }
+}

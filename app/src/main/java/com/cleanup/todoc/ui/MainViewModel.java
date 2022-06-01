@@ -1,6 +1,6 @@
 package com.cleanup.todoc.ui;
 
-import android.view.View;
+import android.content.DialogInterface;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -8,10 +8,12 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 public class MainViewModel extends ViewModel {
     /**
@@ -76,6 +78,34 @@ public class MainViewModel extends ViewModel {
         tasks.remove(task);
         updateTasks();
     }
+
+    public void createTask(String taskName, Object selectedItem, DialogDismissCallBack callBack) {//TODO: faire passer le callback
+        Project taskProject = null;
+        if (selectedItem instanceof Project) {
+            taskProject = (Project) selectedItem;
+        }
+
+        // If a name has not been set
+        if (taskName.trim().isEmpty()) {
+            this._state.postValue(new MainStateOnCreate(true, callBack));
+        }
+        // If both project and name of the task have been set
+        else if (taskProject != null) {
+            // TODO: Replace this by id of persisted task
+            long id = (long) (Math.random() * 50000);
+
+
+            Task task = new Task(
+                    id,
+                    taskProject.getId(),
+                    taskName,
+                    new Date().getTime()
+            );
+            addNewTask(task);
+            this._state.postValue(new MainStateOnCreate(false, callBack));
+        }
+    }
+
 
     /**
      * List of all possible sort methods for task

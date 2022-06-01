@@ -25,7 +25,7 @@ import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Objects;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         viewModel = retrieveViewModel();
         viewModel.state.observe(this, this::render);
+        //RX
         Thread initThread = new Thread(() -> {
             mRepository = new TaskRepository(getApplicationContext());
             tasks = mRepository.getTasks();
@@ -124,6 +125,15 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             adapter.updateTasks(state.getTasks());
             listTasks.setAdapter(adapter);
         }
+        if(mainState instanceof MainStateOnCreate){
+            MainStateOnCreate state = (MainStateOnCreate) mainState;
+            if(state.getOnError()){
+                dialogEditText.setError(getString(R.string.empty_task_name));
+            }
+            else{
+                state.getCallBack().dismissDialog();
+            }
+        }
     }
 
     @Override
@@ -135,11 +145,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         viewModel.getSortMethod(id);
-
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -151,52 +157,14 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         deleteThread.start();
         viewModel.removeTasks(task);
     }
-
     /**
      * Called when the user clicks on the positive button of the Create Task Dialog.
      *
      * @param dialogInterface the current displayed dialog
      */
     private void onPositiveButtonClick(DialogInterface dialogInterface) {
-        // If dialog is open
-        if (dialogEditText != null && dialogSpinner != null) {
-            // Get the name of the task
-            String taskName = dialogEditText.getText().toString();
-
-            // Get the selected project to be associated to the task
-            Project taskProject = null;
-            if (dialogSpinner.getSelectedItem() instanceof Project) {
-                taskProject = (Project) dialogSpinner.getSelectedItem();
-            }
-
-            // If a name has not been set
-            if (taskName.trim().isEmpty()) {
-                dialogEditText.setError(getString(R.string.empty_task_name));
-            }
-            // If both project and name of the task have been set
-            else if (taskProject != null) {
-                // TODO: Replace this by id of persisted task
-                long id = (long) (Math.random() * 50000);
-
-
-                Task task = new Task(
-                        id,
-                        taskProject.getId(),
-                        taskName,
-                        new Date().getTime()
-                );
-                viewModel.addNewTask(task);
-                dialogInterface.dismiss();
-            }
-            // If name has been set, but project has not been set (this should never occur)
-            else{
-                dialogInterface.dismiss();
-            }
-        }
-        // If dialog is aloready closed
-        else {
-            dialogInterface.dismiss();
-        }
+        viewModel.createTask(Objects.requireNonNull(dialogEditText).getText().toString(),
+                Objects.requireNonNull(dialogSpinner).getSelectedItem(), dialogInterface::dismiss);
     }
 
     /**
@@ -234,20 +202,10 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         dialog = alertBuilder.create();
 
         // This instead of listener to positive button in order to avoid automatic dismiss
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+        dialog.setOnShowListener(dialogInterface -> {
 
-            @Override
-            public void onShow(DialogInterface dialogInterface) {
-
-                Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                button.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View view) {
-                        onPositiveButtonClick(dialog);
-                    }
-                });
-            }
+            Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(view -> onPositiveButtonClick(dialog));
         });
 
         return dialog;
