@@ -17,30 +17,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TaskRepository {
-
-    private final Context context;
-    private final List<TaskData> taskData;
     private final TaskDao taskDao;
     private final TaskDataBase dataBase;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 
-    public TaskRepository(Context context){
-        this.context = context.getApplicationContext();
-        this.dataBase = Room.databaseBuilder(this.context,
+    public TaskRepository(Context context) {
+        this.dataBase = Room.databaseBuilder(context.getApplicationContext(),
                 TaskDataBase.class, "task_database").build();
         this.taskDao = dataBase.taskDao();
-        this.taskData = taskDao.getAll();
     }
 
     @NonNull
-    public ArrayList<Task> getTasks() {
-        ArrayList<Task> tasks = new ArrayList<>();
-        for (TaskData data: this.taskData
-        ) {
-            tasks.add(new Task(data.taskId, data.projectId, data.taskName, data.creationTimeStamp));
-        }
-        return tasks;
+    public LiveData<ArrayList<Task>> getTasks() {
+        return Transformations.map(taskDao.getAll(), input -> {
+            ArrayList<Task> tasks = new ArrayList<>();
+            for (TaskData data : input) {
+                tasks.add(new Task(data.taskId, data.projectId, data.taskName, data.creationTimeStamp));
+            }
+            return tasks;
+        });
     }
 
     public void updateDataBase(ArrayList<Task> tasks) {

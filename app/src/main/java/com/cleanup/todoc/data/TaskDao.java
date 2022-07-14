@@ -1,5 +1,6 @@
 package com.cleanup.todoc.data;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -13,7 +14,7 @@ import java.util.List;
 @Dao
 public interface TaskDao {
     @Query("SELECT * FROM taskdata")
-    List<TaskData> getAll();
+    LiveData<List<TaskData>> getAll();
 
     @Query("SELECT * FROM taskdata WHERE taskId IN (:taskIds)")
     List<TaskData> loadAllByIds(int[] taskIds);
