@@ -2,6 +2,7 @@ package com.cleanup.todoc.data;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -12,7 +13,14 @@ public class TaskData {
         this.projectId = projectId;
         this.creationTimeStamp = creationTimeStamp;
     }
-    @PrimaryKey
+    @Ignore
+    public TaskData(String taskName, Long projectId, Long creationTimeStamp){
+        this.taskName = taskName;
+        this.projectId = projectId;
+        this.creationTimeStamp = creationTimeStamp;
+    }
+    @PrimaryKey(autoGenerate = true)
+    //anotation de génération
     public Long taskId;
 
     @ColumnInfo(name = "task_name")

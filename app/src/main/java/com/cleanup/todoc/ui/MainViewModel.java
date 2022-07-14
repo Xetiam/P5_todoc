@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel;
 import com.cleanup.todoc.R;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
+import com.cleanup.todoc.ui.utils.DialogDismissCallBack;
+import com.cleanup.todoc.ui.utils.TaskRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,8 +23,8 @@ public class MainViewModel extends ViewModel {
      */
     @NonNull
     private SortMethod sortMethod = SortMethod.NONE;
-    private ArrayList<Task> tasks = new  ArrayList();
-    private final MutableLiveData<MainState> _state = new MutableLiveData<>();
+    private ArrayList<Task> mTasks = new  ArrayList<>();
+    private final MediatorLiveData<MainState> _state = new MediatorLiveData<>();
     final LiveData<MainState> state = _state;
 
     public void initTasks(ArrayList<Task> mTasks) {
@@ -30,7 +32,7 @@ public class MainViewModel extends ViewModel {
         getSortMethod(R.id.filter_recent_first);
     }
 
-    public void getSortMethod(int id) {
+    public void setSortMethod(int id) {
         if (id == R.id.filter_alphabetical) {
             sortMethod = SortMethod.ALPHABETICAL;
         } else if (id == R.id.filter_alphabetical_inverted) {
@@ -40,7 +42,7 @@ public class MainViewModel extends ViewModel {
         } else if (id == R.id.filter_recent_first) {
             sortMethod = SortMethod.RECENT_FIRST;
         }
-        updateTasks();
+        sort();
     }
     /**
      * Updates the list of tasks in the UI
@@ -69,6 +71,24 @@ public class MainViewModel extends ViewModel {
         }
     }
 
+    public void sort(){
+        switch (sortMethod) {
+            case ALPHABETICAL:
+                Collections.sort(mTasks, new Task.TaskAZComparator());
+                break;
+            case ALPHABETICAL_INVERTED:
+                Collections.sort(mTasks, new Task.TaskZAComparator());
+                break;
+            case RECENT_FIRST:
+                Collections.sort(mTasks, new Task.TaskRecentComparator());
+                break;
+            case OLD_FIRST:
+                Collections.sort(mTasks, new Task.TaskOldComparator());
+                break;
+        }
+        updateTasks();
+    }
+
     public void addNewTask(Task task) {
         tasks.add(task);
         updateTasks();
@@ -79,30 +99,24 @@ public class MainViewModel extends ViewModel {
         updateTasks();
     }
 
-    public void createTask(String taskName, Object selectedItem, DialogDismissCallBack callBack) {//TODO: faire passer le callback
+    public void createTask(String taskName, Object selectedItem, DialogDismissCallBack callBack) {
         Project taskProject = null;
         if (selectedItem instanceof Project) {
             taskProject = (Project) selectedItem;
         }
-
         // If a name has not been set
         if (taskName.trim().isEmpty()) {
-            this._state.postValue(new MainStateOnCreate(true, callBack));
+            this._state.postValue(new MainStateOnCreate(true, callBack, null));
         }
         // If both project and name of the task have been set
         else if (taskProject != null) {
-            // TODO: Replace this by id of persisted task
-            long id = (long) (Math.random() * 50000);
-
-
             Task task = new Task(
-                    id,
                     taskProject.getId(),
                     taskName,
                     new Date().getTime()
             );
             addNewTask(task);
-            this._state.postValue(new MainStateOnCreate(false, callBack));
+            this._state.postValue(new MainStateOnCreate(false, callBack, mTasks));
         }
     }
 

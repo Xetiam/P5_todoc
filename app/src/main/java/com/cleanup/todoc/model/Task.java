@@ -49,6 +49,13 @@ public class Task {
         this.setName(name);
         this.setCreationTimestamp(creationTimestamp);
     }
+    public Task(long projectId, @NonNull String name, long creationTimestamp) {
+        this.setProjectId(projectId);
+        this.setName(name);
+        this.setCreationTimestamp(creationTimestamp);
+    }
+
+
 
     /**
      * Returns the unique identifier of the task.

@@ -1,8 +1,10 @@
-package com.cleanup.todoc.ui;
+package com.cleanup.todoc.ui.utils;
 
 import android.content.Context;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Transformations;
 import androidx.room.Room;
 
 import com.cleanup.todoc.data.TaskDao;
@@ -11,7 +13,8 @@ import com.cleanup.todoc.data.TaskDataBase;
 import com.cleanup.todoc.model.Task;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TaskRepository {
 
@@ -19,6 +22,7 @@ public class TaskRepository {
     private final List<TaskData> taskData;
     private final TaskDao taskDao;
     private final TaskDataBase dataBase;
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 
     public TaskRepository(Context context){
@@ -28,6 +32,7 @@ public class TaskRepository {
         this.taskDao = dataBase.taskDao();
         this.taskData = taskDao.getAll();
     }
+
     @NonNull
     public ArrayList<Task> getTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
@@ -38,14 +43,18 @@ public class TaskRepository {
         return tasks;
     }
 
-    public void updateDataBase(ArrayList<Task> tasks){
-        for (Task task: tasks
-             ) {
-            taskDao.insertAll((new TaskData(task.getId(), task.getName(), task.getProjectId(), task.getCreationTimestamp())));
+    public void updateDataBase(ArrayList<Task> tasks) {
+        for (Task task : tasks
+        ) {
+            executorService.execute(() -> taskDao.insertAll((new TaskData(task.getName(), task.getProjectId(), task.getCreationTimestamp()))));
         }
     }
 
-    public void deleteTaskOnDataBase(Task task){
-        taskDao.delete(new TaskData(task.getId(),task.getName(), task.getProjectId(), task.getCreationTimestamp()));
+    public void addTaskToDataBase(Task task){
+        executorService.execute(() -> taskDao.insertAll((new TaskData(task.getName(), task.getProjectId(), task.getCreationTimestamp()))));
+    }
+
+    public void deleteTaskOnDataBase(Task task) {
+        executorService.execute(() -> taskDao.delete(new TaskData(task.getId(), task.getName(), task.getProjectId(), task.getCreationTimestamp())));
     }
 }

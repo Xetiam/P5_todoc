@@ -1,6 +1,7 @@
 package com.cleanup.todoc.ui;
 
 import com.cleanup.todoc.model.Task;
+import com.cleanup.todoc.ui.utils.DialogDismissCallBack;
 
 import java.util.ArrayList;
 
@@ -21,10 +22,13 @@ class MainStateWithNoTasks extends MainState {
 class MainStateOnCreate extends MainState {
     private Boolean isOnError;
     private DialogDismissCallBack callBack;
+    private ArrayList<Task> tasks;
 
-    MainStateOnCreate(Boolean isOnError, DialogDismissCallBack callBack){
+
+    MainStateOnCreate(Boolean isOnError, DialogDismissCallBack callBack, ArrayList<Task> tasks){
         this.isOnError = isOnError;
         this.callBack = callBack;
+        this.tasks = tasks;
     }
 
     public Boolean getOnError() {
@@ -33,5 +37,9 @@ class MainStateOnCreate extends MainState {
 
     public DialogDismissCallBack getCallBack() {
         return callBack;
+    }
+
+    public ArrayList<Task> getTasks() {
+        return tasks;
     }
 }

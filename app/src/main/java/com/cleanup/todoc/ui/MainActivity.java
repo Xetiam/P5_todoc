@@ -23,6 +23,7 @@ import com.cleanup.todoc.R;
 import com.cleanup.todoc.factory.ViewModelFactory;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
+import com.cleanup.todoc.ui.utils.TasksAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -93,13 +94,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         viewModel = retrieveViewModel();
         viewModel.state.observe(this, this::render);
-        //RX
-        Thread initThread = new Thread(() -> {
-            mRepository = new TaskRepository(getApplicationContext());
-            tasks = mRepository.getTasks();
-            viewModel.initTasks(tasks);
-        });
-        initThread.start();
+        viewModel.onLoadView();
+
 
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
 
@@ -132,6 +128,10 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             }
             else{
                 state.getCallBack().dismissDialog();
+                lblNoTasks.setVisibility(View.GONE);
+                listTasks.setVisibility(View.VISIBLE);
+                adapter.updateTasks(state.getTasks());
+                listTasks.setAdapter(adapter);
             }
         }
     }
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        viewModel.getSortMethod(id);
+        viewModel.setSortMethod(id);
         return super.onOptionsItemSelected(item);
     }
 
@@ -203,11 +203,9 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         // This instead of listener to positive button in order to avoid automatic dismiss
         dialog.setOnShowListener(dialogInterface -> {
-
             Button button = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             button.setOnClickListener(view -> onPositiveButtonClick(dialog));
         });
-
         return dialog;
     }
 
@@ -222,8 +220,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         }
     }
 
-    @VisibleForTesting
-    private MainViewModel retrieveViewModel() {
-        return ViewModelFactory.getInstance().obtainViewModel(MainViewModel.class);
+    MainViewModel retrieveViewModel() {
+        return ViewModelFactory.getInstance(getApplication()).obtainViewModel(MainViewModel.class);
     }
 }
