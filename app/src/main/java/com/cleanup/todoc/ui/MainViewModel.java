@@ -1,10 +1,9 @@
 package com.cleanup.todoc.ui;
 
-import android.content.DialogInterface;
-
+import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.cleanup.todoc.R;
@@ -18,6 +17,7 @@ import java.util.Collections;
 import java.util.Date;
 
 public class MainViewModel extends ViewModel {
+    private final TaskRepository mRepository;
     /**
      * The sort method to be used to display tasks
      */
@@ -27,9 +27,15 @@ public class MainViewModel extends ViewModel {
     private final MediatorLiveData<MainState> _state = new MediatorLiveData<>();
     final LiveData<MainState> state = _state;
 
-    public void initTasks(ArrayList<Task> mTasks) {
-        this.tasks = mTasks;
-        getSortMethod(R.id.filter_recent_first);
+    public MainViewModel(Context context){
+        mRepository = new TaskRepository(context);
+    }
+
+    public void onLoadView() {
+        _state.addSource(mRepository.getTasks(), tasks -> {
+            mTasks = tasks;
+            updateTasks();
+        });
     }
 
     public void setSortMethod(int id) {
@@ -48,26 +54,10 @@ public class MainViewModel extends ViewModel {
      * Updates the list of tasks in the UI
      */
     public void updateTasks() {
-        if (tasks.size() == 0) {
+        if (mTasks.size() == 0) {
             this._state.postValue(new MainStateWithNoTasks());
         } else {
-
-            switch (sortMethod) {
-                case ALPHABETICAL:
-                    Collections.sort(tasks, new Task.TaskAZComparator());
-                    break;
-                case ALPHABETICAL_INVERTED:
-                    Collections.sort(tasks, new Task.TaskZAComparator());
-                    break;
-                case RECENT_FIRST:
-                    Collections.sort(tasks, new Task.TaskRecentComparator());
-                    break;
-                case OLD_FIRST:
-                    Collections.sort(tasks, new Task.TaskOldComparator());
-                    break;
-
-            }
-            this._state.postValue(new MainStateWithTasks(tasks));
+            this._state.postValue(new MainStateWithTasks(mTasks));
         }
     }
 
@@ -90,12 +80,14 @@ public class MainViewModel extends ViewModel {
     }
 
     public void addNewTask(Task task) {
-        tasks.add(task);
+        mTasks.add(task);
+        mRepository.addTaskToDataBase(task);
         updateTasks();
     }
 
     public void removeTasks(Task task) {
-        tasks.remove(task);
+        mTasks.remove(task);
+        mRepository.deleteTaskOnDataBase(task);
         updateTasks();
     }
 

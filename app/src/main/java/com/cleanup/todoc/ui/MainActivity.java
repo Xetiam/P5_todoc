@@ -41,14 +41,9 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     private final Project[] allProjects = Project.getAllProjects();
 
     /**
-     * List of all current tasks of the application
-     */
-    @NonNull
-    private ArrayList<Task> tasks = new  ArrayList();
-    /**
      * The adapter which handles the list of tasks
      */
-    private TasksAdapter adapter = new TasksAdapter(tasks, this);
+    private TasksAdapter adapter = new TasksAdapter(new ArrayList<>(), this);
     /**
      * Dialog to create a new task
      */
@@ -75,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     @NonNull
     private RecyclerView listTasks;
     private MainViewModel viewModel;
-    private TaskRepository mRepository;
     /**
      * The TextView displaying the empty state
      */
@@ -109,15 +103,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         }
         if(mainState instanceof MainStateWithTasks){
             MainStateWithTasks state = (MainStateWithTasks) mainState;
-            tasks = state.getTasks();
             lblNoTasks.setVisibility(View.GONE);
             listTasks.setVisibility(View.VISIBLE);
-            Thread upDateThread = new Thread(() -> {
-                mRepository.updateDataBase(state.getTasks());
-                tasks =  mRepository.getTasks();
-
-            });
-            upDateThread.start();
             adapter.updateTasks(state.getTasks());
             listTasks.setAdapter(adapter);
         }
@@ -151,10 +138,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
     @Override
     public void onDeleteTask(Task task) {
-        Thread deleteThread = new Thread(() -> {
-            mRepository.deleteTaskOnDataBase(task);
-        });
-        deleteThread.start();
         viewModel.removeTasks(task);
     }
     /**
