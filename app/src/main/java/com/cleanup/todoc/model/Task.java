@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * <p>Model for the tasks of the application.</p>
@@ -49,12 +50,12 @@ public class Task {
         this.setName(name);
         this.setCreationTimestamp(creationTimestamp);
     }
+
     public Task(long projectId, @NonNull String name, long creationTimestamp) {
         this.setProjectId(projectId);
         this.setName(name);
         this.setCreationTimestamp(creationTimestamp);
     }
-
 
 
     /**
@@ -73,15 +74,6 @@ public class Task {
      */
     private void setId(long id) {
         this.id = id;
-    }
-
-    /**
-     * Sets the unique identifier of the project associated to the task.
-     *
-     * @param projectId the unique identifier of the project associated to the task to set
-     */
-    private void setProjectId(long projectId) {
-        this.projectId = projectId;
     }
 
     /**
@@ -113,6 +105,10 @@ public class Task {
         this.name = name;
     }
 
+    public long getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
     /**
      * Sets the timestamp when the task has been created.
      *
@@ -122,12 +118,30 @@ public class Task {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public long getCreationTimestamp() {
-        return creationTimestamp;
-    }
-
     public long getProjectId() {
         return projectId;
+    }
+
+    /**
+     * Sets the unique identifier of the project associated to the task.
+     *
+     * @param projectId the unique identifier of the project associated to the task to set
+     */
+    private void setProjectId(long projectId) {
+        this.projectId = projectId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id && projectId == task.projectId && creationTimestamp == task.creationTimestamp && name.equals(task.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, projectId, name, creationTimestamp);
     }
 
     /**

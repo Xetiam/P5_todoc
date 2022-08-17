@@ -1,6 +1,5 @@
 package com.cleanup.todoc.ui;
 
-import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
@@ -15,20 +14,26 @@ import com.cleanup.todoc.ui.utils.TaskRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.concurrent.Executor;
 
 public class MainViewModel extends ViewModel {
+    @NonNull
     private final TaskRepository mRepository;
+
+    @NonNull
+    private final Executor mIoExecutor;
+    private final MediatorLiveData<MainState> _state = new MediatorLiveData<>();
+    final LiveData<MainState> state = _state;
     /**
      * The sort method to be used to display tasks
      */
     @NonNull
     private SortMethod sortMethod = SortMethod.NONE;
-    private ArrayList<Task> mTasks = new  ArrayList<>();
-    private final MediatorLiveData<MainState> _state = new MediatorLiveData<>();
-    final LiveData<MainState> state = _state;
+    private ArrayList<Task> mTasks = new ArrayList<>();
 
-    public MainViewModel(Context context){
-        mRepository = new TaskRepository(context);
+    public MainViewModel(TaskRepository repository, Executor ioExecutor) {
+        mRepository = repository;
+        mIoExecutor = ioExecutor;
     }
 
     public void onLoadView() {
@@ -50,6 +55,7 @@ public class MainViewModel extends ViewModel {
         }
         sort();
     }
+
     /**
      * Updates the list of tasks in the UI
      */
@@ -61,7 +67,7 @@ public class MainViewModel extends ViewModel {
         }
     }
 
-    public void sort(){
+    public void sort() {
         switch (sortMethod) {
             case ALPHABETICAL:
                 Collections.sort(mTasks, new Task.TaskAZComparator());
@@ -81,13 +87,13 @@ public class MainViewModel extends ViewModel {
 
     public void addNewTask(Task task) {
         mTasks.add(task);
-        mRepository.addTaskToDataBase(task);
+        mIoExecutor.execute(() -> mRepository.addTaskToDataBase(task));
         updateTasks();
     }
 
     public void removeTasks(Task task) {
         mTasks.remove(task);
-        mRepository.deleteTaskOnDataBase(task);
+        mIoExecutor.execute(() -> mRepository.deleteTaskOnDataBase(task));
         updateTasks();
     }
 

@@ -42,4 +42,6 @@ dependencies {
     debugImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
     debugImplementation 'org.mockito:mockito-core:4.0.0'
     debugImplementation "org.robolectric:robolectric:4.6.1"
+    // Helps testing livedata : InstantTaskExecutorRule, for example
+    testImplementation 'androidx.arch.core:core-testing:2.1.0'
 }

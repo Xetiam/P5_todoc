@@ -7,8 +7,6 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import java.security.Policy;
-import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -30,6 +28,9 @@ public interface TaskDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(TaskData... tasks);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insert(TaskData task);
 
     @Delete
     void delete(TaskData task);
