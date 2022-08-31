@@ -9,4 +9,8 @@ public class LiveDataTestUtils {
         });
         return liveData.getValue();
     }
+    public static <T> void observeValueForTesting(@NonNull final LiveData<T> liveData) {
+        liveData.observeForever(t -> {
+        });
+    }
 }

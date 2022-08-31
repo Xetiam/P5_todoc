@@ -170,7 +170,7 @@ public class Task {
     public static class TaskRecentComparator implements Comparator<Task> {
         @Override
         public int compare(Task left, Task right) {
-            return (int) (right.creationTimestamp - left.creationTimestamp);
+            return (int) (left.creationTimestamp - right.creationTimestamp);
         }
     }
 
@@ -180,7 +180,7 @@ public class Task {
     public static class TaskOldComparator implements Comparator<Task> {
         @Override
         public int compare(Task left, Task right) {
-            return (int) (left.creationTimestamp - right.creationTimestamp);
+            return (int) (right.creationTimestamp - left.creationTimestamp);
         }
     }
 }

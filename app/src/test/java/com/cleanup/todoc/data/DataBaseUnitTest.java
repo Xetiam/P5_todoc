@@ -2,6 +2,7 @@ package com.cleanup.todoc.data;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
@@ -83,19 +84,19 @@ public class DataBaseUnitTest {
         // Given
         Long insertedDate = new Date().getTime();
         Task taskToDelete = DataUtils.getDefaultTask(insertedDate).get(0);
+        TaskData taskDataDeleted = new TaskData(taskToDelete.getId(), taskToDelete.getName(), taskToDelete.getProjectId(), taskToDelete.getCreationTimestamp());
         MutableLiveData<List<TaskData>> projectsWithTasksLiveData = Mockito.spy(new MutableLiveData<>());
         projectsWithTasksLiveData.setValue(DataUtils.getDefaultTaskData(insertedDate));
-        ArgumentCaptor<TaskData> argument = ArgumentCaptor.forClass(TaskData.class);
+        Mockito.doReturn(projectsWithTasksLiveData).when(taskDataSource).getAll();
 
         //When
         taskRepository.deleteTaskOnDataBase(taskToDelete);
-        Mockito.verify(taskDataSource).delete(argument.capture());
-        Mockito.doReturn(projectsWithTasksLiveData).when(taskDataSource).getAll();
-        ArrayList<Task> resultFromDB = LiveDataTestUtils.getValueForTesting(taskRepository.getTasks());
 
         //Then
-        assert(resultFromDB.contains(taskToDelete));
-        Mockito.verify(taskDataSource).getAll();
+        ArgumentCaptor<TaskData> argument = ArgumentCaptor.forClass(TaskData.class);
+        Mockito.verify(taskDataSource).delete(argument.capture());
+        assertEquals(argument.getValue(), taskDataDeleted);
+        Mockito.verify(taskDataSource).delete(taskDataDeleted);
         Mockito.verifyNoMoreInteractions(taskDataSource);
     }
 }
