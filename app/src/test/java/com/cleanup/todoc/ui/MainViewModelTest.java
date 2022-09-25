@@ -7,9 +7,10 @@ import static org.junit.Assert.assertTrue;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 
+import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 import com.cleanup.todoc.R;
-import com.cleanup.todoc.ui.utils.TaskRepository;
+import com.cleanup.todoc.ui.utils.MainRepository;
 import com.cleanup.todoc.utils.DataUtils;
 import com.cleanup.todoc.utils.LiveDataTestUtils;
 import com.cleanup.todoc.utils.TestExecutor;
@@ -19,7 +20,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -28,25 +28,28 @@ import java.util.concurrent.Executor;
 
 public class MainViewModelTest {
 
-    private final TaskRepository taskRepository = Mockito.mock(TaskRepository.class);
+    private final MainRepository mainRepository = Mockito.mock(MainRepository.class);
     private final Executor ioExecutor = Mockito.spy(new TestExecutor());
     private final Long insertedDate = new Date().getTime();
-    private final MutableLiveData<List<Task>> projectsMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<Task>> tasksMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<Project>> projectsMutableLiveData = new MutableLiveData<>();
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
     private MainViewModel viewModel;
 
     @Before
     public void setUp() {
-        Mockito.doReturn(projectsMutableLiveData).when(taskRepository).getTasks();
+        Mockito.doReturn(tasksMutableLiveData).when(mainRepository).getTasks();
+        Mockito.doReturn(projectsMutableLiveData).when(mainRepository).getProject();
 
-        viewModel = new MainViewModel(taskRepository, ioExecutor);
+        viewModel = new MainViewModel(mainRepository, ioExecutor);
+        projectsMutableLiveData.setValue(DataUtils.getDefaultProjects());
     }
 
     @Test
     public void on_load_view_test() {
         // Given
-        projectsMutableLiveData.setValue(DataUtils.getDefaultTask(insertedDate));
+        tasksMutableLiveData.setValue(DataUtils.getDefaultTask(insertedDate));
 
         // When
         viewModel.onLoadView();
@@ -60,7 +63,7 @@ public class MainViewModelTest {
     public void on_sorted_list_by_alphabetical() {
         //Given
         ArrayList<Task> witnessList = DataUtils.getTaskToSortByName(insertedDate);
-        projectsMutableLiveData.setValue(witnessList);
+        tasksMutableLiveData.setValue(witnessList);
         Task.TaskAZComparator comp = new Task.TaskAZComparator();
         Collections.sort(witnessList, comp);
         viewModel.setSortMethod(R.id.filter_alphabetical);
@@ -78,7 +81,7 @@ public class MainViewModelTest {
     public void on_sorted_list_by_alphabetical_inverted() {
         //Given
         ArrayList<Task> witnessList = DataUtils.getTaskToSortByName(insertedDate);
-        projectsMutableLiveData.setValue(witnessList);
+        tasksMutableLiveData.setValue(witnessList);
         Task.TaskZAComparator comp = new Task.TaskZAComparator();
         Collections.sort(witnessList, comp);
         viewModel.setSortMethod(R.id.filter_alphabetical_inverted);
@@ -98,7 +101,7 @@ public class MainViewModelTest {
         final Long insertedDate2 = new Date().getTime();
         final Long insertedDate3 = new Date().getTime();
         ArrayList<Task> witnessList = DataUtils.getTaskToSortByDate(insertedDate,insertedDate2,insertedDate3);
-        projectsMutableLiveData.setValue(witnessList);
+        tasksMutableLiveData.setValue(witnessList);
         Task.TaskOldComparator comp = new Task.TaskOldComparator();
         Collections.sort(witnessList, comp);
         viewModel.setSortMethod(R.id.filter_oldest_first);
@@ -120,7 +123,7 @@ public class MainViewModelTest {
         final Long insertedDate3 = new Date().getTime();
         ArrayList<Task> witnessList = DataUtils.getTaskToSortByDate(insertedDate,insertedDate2,insertedDate3);
         ArrayList<Task> test = DataUtils.getTaskToSortByDate(insertedDate,insertedDate2,insertedDate3);
-        projectsMutableLiveData.setValue(witnessList);
+        tasksMutableLiveData.setValue(witnessList);
         Task.TaskRecentComparator comp = new Task.TaskRecentComparator();
         Collections.sort(test, comp);
 
@@ -139,7 +142,7 @@ public class MainViewModelTest {
         //Given
         ArrayList<Task> witnessList = DataUtils.getDefaultTask(insertedDate);
         Task taskToBeDeleted = witnessList.get(0);
-        projectsMutableLiveData.setValue(witnessList);
+        tasksMutableLiveData.setValue(witnessList);
 
         //When
         viewModel.onLoadView();

@@ -36,15 +36,6 @@ import java.util.Objects;
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
     /**
-     * List of all projects available in the application
-     */
-    private final Project[] allProjects = Project.getAllProjects();
-
-    /**
-     * The adapter which handles the list of tasks
-     */
-    private TasksAdapter adapter = new TasksAdapter(new ArrayList<>(), this);
-    /**
      * Dialog to create a new task
      */
     @Nullable
@@ -68,8 +59,11 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     // Suppress warning is safe because variable is initialized in onCreate
     @SuppressWarnings("NullableProblems")
     @NonNull
+    private Project[] allProjects;
     private RecyclerView listTasks;
     private MainViewModel viewModel;
+    private TasksAdapter adapter;
+
     /**
      * The TextView displaying the empty state
      */
@@ -88,21 +82,34 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         viewModel = retrieveViewModel();
         viewModel.state.observe(this, this::render);
-        viewModel.onLoadView();
-
+        viewModel.onLoadViewProject();
 
         findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
 
     }
 
     private void render(MainState mainState) {
+        if(mainState instanceof MainStateWithNoProjects){
+            viewModel.getProjects();
+        }
+        if(mainState instanceof MainStateWithProjects){
+            MainStateWithProjects state = (MainStateWithProjects) mainState;
+            allProjects = state.getProjects();
+            viewModel.onLoadView();
+        }
+        if(mainState instanceof MainStateWithNoProjects){
+            viewModel.onLoadViewProject();
+        }
         if(mainState instanceof MainStateWithNoTasks){
+            MainStateWithNoTasks state = (MainStateWithNoTasks) mainState;
+            adapter = new TasksAdapter(new ArrayList<>(), this, allProjects);
             lblNoTasks.setVisibility(View.VISIBLE);
             listTasks.setVisibility(View.GONE);
             listTasks.setAdapter(adapter);
         }
         if(mainState instanceof MainStateWithTasks){
             MainStateWithTasks state = (MainStateWithTasks) mainState;
+            adapter = new TasksAdapter(new ArrayList<>(), this, allProjects);
             lblNoTasks.setVisibility(View.GONE);
             listTasks.setVisibility(View.VISIBLE);
             adapter.updateTasks(state.getTasks());

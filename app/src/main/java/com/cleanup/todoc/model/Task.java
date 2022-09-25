@@ -77,16 +77,6 @@ public class Task {
     }
 
     /**
-     * Returns the project associated to the task.
-     *
-     * @return the project associated to the task
-     */
-    @Nullable
-    public Project getProject() {
-        return Project.getProjectById(projectId);
-    }
-
-    /**
      * Returns the name of the task.
      *
      * @return the name of the task
@@ -144,6 +134,8 @@ public class Task {
         return Objects.hash(id, projectId, name, creationTimestamp);
     }
 
+
+
     /**
      * Comparator to sort task from A to Z
      */
@@ -170,7 +162,7 @@ public class Task {
     public static class TaskRecentComparator implements Comparator<Task> {
         @Override
         public int compare(Task left, Task right) {
-            return (int) (left.creationTimestamp - right.creationTimestamp);
+            return (int) (right.creationTimestamp - left.creationTimestamp);
         }
     }
 
@@ -180,7 +172,7 @@ public class Task {
     public static class TaskOldComparator implements Comparator<Task> {
         @Override
         public int compare(Task left, Task right) {
-            return (int) (right.creationTimestamp - left.creationTimestamp);
+            return (int) (left.creationTimestamp - right.creationTimestamp);
         }
     }
 }

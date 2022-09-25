@@ -1,11 +1,24 @@
 package com.cleanup.todoc.ui;
 
+import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 import com.cleanup.todoc.ui.utils.DialogDismissCallBack;
 
 import java.util.ArrayList;
 
 public class MainState {
+}
+class MainStateWithNoProjects extends MainState{
+}
+class MainStateWithProjects extends MainState{
+    private Project[] projects;
+    public MainStateWithProjects(Project[] projects){
+        this.projects = projects;
+    }
+
+    public Project[] getProjects() {
+        return projects;
+    }
 }
 class MainStateWithTasks extends MainState {
     private ArrayList<Task> tasks;
@@ -17,6 +30,7 @@ class MainStateWithTasks extends MainState {
         return tasks;
     }
 }
+
 class MainStateWithNoTasks extends MainState {
 }
 class MainStateOnCreate extends MainState {

@@ -9,16 +9,17 @@ import com.cleanup.todoc.R;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 import com.cleanup.todoc.ui.utils.DialogDismissCallBack;
-import com.cleanup.todoc.ui.utils.TaskRepository;
+import com.cleanup.todoc.ui.utils.MainRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public class MainViewModel extends ViewModel {
     @NonNull
-    private final TaskRepository mRepository;
+    private final MainRepository mRepository;
 
     @NonNull
     private final Executor mIoExecutor;
@@ -30,17 +31,40 @@ public class MainViewModel extends ViewModel {
     @NonNull
     private SortMethod sortMethod = SortMethod.NONE;
     private ArrayList<Task> mTasks = new ArrayList<>();
+    private Project[] mProjects;
 
-    public MainViewModel(TaskRepository repository, Executor ioExecutor) {
+    public MainViewModel(MainRepository repository, Executor ioExecutor) {
         mRepository = repository;
         mIoExecutor = ioExecutor;
     }
 
+    public void onLoadViewProject() {
+        _state.addSource(mRepository.getProject(), projects -> {
+            if(projects.size() != 0){
+                mProjects = projects.toArray(new Project[0]);
+            }
+            else{
+                mProjects = new Project[]{};
+            }
+            if(mProjects.length == 0){
+                mIoExecutor.execute(mRepository::addDefaultProject);
+            }
+            updateProjects();
+        });
+    }
     public void onLoadView() {
         _state.addSource(mRepository.getTasks(), tasks -> {
             mTasks = tasks;
             updateTasks();
         });
+    }
+
+    private void updateProjects() {
+        if (mProjects.length == 0) {
+            this._state.postValue(new MainStateWithNoProjects());
+        } else {
+            this._state.postValue(new MainStateWithProjects(mProjects));
+        }
     }
 
     public void setSortMethod(int id) {
@@ -116,6 +140,10 @@ public class MainViewModel extends ViewModel {
             addNewTask(task);
             this._state.postValue(new MainStateOnCreate(false, callBack, mTasks));
         }
+    }
+
+    public void getProjects() {
+        mIoExecutor.execute(() -> mRepository.getProject());
     }
 
 

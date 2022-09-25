@@ -33,5 +33,6 @@ public interface TaskDao {
     void insert(TaskData task);
 
     @Delete
-    void delete(TaskData task);
+    void
+    delete(TaskData task);
 }

@@ -1,6 +1,7 @@
 package com.cleanup.todoc;
 
 
+import static androidx.test.InstrumentationRegistry.getContext;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.replaceText;
@@ -21,6 +22,7 @@ import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.runner.AndroidJUnit4;
 
+import com.cleanup.todoc.data.AppDatabase;
 import com.cleanup.todoc.ui.MainActivity;
 
 import org.junit.After;

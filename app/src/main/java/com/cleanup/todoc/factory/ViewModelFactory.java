@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.cleanup.todoc.data.AppDatabase;
 import com.cleanup.todoc.ui.MainViewModel;
-import com.cleanup.todoc.ui.utils.TaskRepository;
+import com.cleanup.todoc.ui.utils.MainRepository;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -19,16 +19,16 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private static ViewModelFactory viewModelFactory;
 
-    private final TaskRepository taskRepository;
+    private final MainRepository mainRepository;
 
     private final Executor ioExecutor = Executors.newFixedThreadPool(4);
 
 
     private ViewModelFactory(Context context) {
         AppDatabase appDatabase = AppDatabase.getInstance(context.getApplicationContext());
-        taskRepository = new TaskRepository(
-                appDatabase.getTaskDao()
-        );
+        mainRepository = new MainRepository(
+                appDatabase.getTaskDao(),
+                appDatabase.getProjectDao());
     }
 
     public static ViewModelFactory getInstance(Application application) {
@@ -45,7 +45,7 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            return (T) new MainViewModel(taskRepository, ioExecutor);
+            return (T) new MainViewModel(mainRepository, ioExecutor);
         }
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
