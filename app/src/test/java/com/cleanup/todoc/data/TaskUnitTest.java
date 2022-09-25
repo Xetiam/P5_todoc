@@ -24,11 +24,9 @@ public class TaskUnitTest {
         final Task task1 = new Task(1, 1L, "task 1", new Date().getTime());
         final Task task2 = new Task(2, 2L, "task 2", new Date().getTime());
         final Task task3 = new Task(3, 3L, "task 3", new Date().getTime());
-        final Task task4 = new Task(4, 4L, "task 4", new Date().getTime());
         assertEquals(1L, task1.getProjectId());
         assertEquals(2L, task2.getProjectId());
         assertEquals(3L, task3.getProjectId());
-        assertEquals(-1, DataUtils.getDefaultProjects().indexOf(new Project(task4.getProjectId(), "Projet Inexistant", 1111)));
     }
 
     @Test

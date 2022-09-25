@@ -89,17 +89,28 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     }
 
     private void render(MainState mainState) {
-        if(mainState instanceof MainStateWithNoProjects){
-            viewModel.getProjects();
+        renderStateProject(mainState);
+        renderStateTask(mainState);
+        renderStateOnTaskCreate(mainState);
+    }
+
+    private void renderStateOnTaskCreate(MainState mainState) {
+        if(mainState instanceof MainStateOnCreate){
+            MainStateOnCreate state = (MainStateOnCreate) mainState;
+            if(state.getOnError()){
+                dialogEditText.setError(getString(R.string.empty_task_name));
+            }
+            else{
+                state.getCallBack().dismissDialog();
+                lblNoTasks.setVisibility(View.GONE);
+                listTasks.setVisibility(View.VISIBLE);
+                adapter.updateTasks(state.getTasks());
+                listTasks.setAdapter(adapter);
+            }
         }
-        if(mainState instanceof MainStateWithProjects){
-            MainStateWithProjects state = (MainStateWithProjects) mainState;
-            allProjects = state.getProjects();
-            viewModel.onLoadView();
-        }
-        if(mainState instanceof MainStateWithNoProjects){
-            viewModel.onLoadViewProject();
-        }
+    }
+
+    private void renderStateTask(MainState mainState) {
         if(mainState instanceof MainStateWithNoTasks){
             MainStateWithNoTasks state = (MainStateWithNoTasks) mainState;
             adapter = new TasksAdapter(new ArrayList<>(), this, allProjects);
@@ -115,18 +126,16 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             adapter.updateTasks(state.getTasks());
             listTasks.setAdapter(adapter);
         }
-        if(mainState instanceof MainStateOnCreate){
-            MainStateOnCreate state = (MainStateOnCreate) mainState;
-            if(state.getOnError()){
-                dialogEditText.setError(getString(R.string.empty_task_name));
-            }
-            else{
-                state.getCallBack().dismissDialog();
-                lblNoTasks.setVisibility(View.GONE);
-                listTasks.setVisibility(View.VISIBLE);
-                adapter.updateTasks(state.getTasks());
-                listTasks.setAdapter(adapter);
-            }
+    }
+
+    private void renderStateProject(MainState mainState) {
+        if(mainState instanceof MainStateWithProjects){
+            MainStateWithProjects state = (MainStateWithProjects) mainState;
+            allProjects = state.getProjects();
+            viewModel.onLoadView();
+        }
+        if(mainState instanceof MainStateWithNoProjects){
+            viewModel.onLoadViewProject();
         }
     }
 
