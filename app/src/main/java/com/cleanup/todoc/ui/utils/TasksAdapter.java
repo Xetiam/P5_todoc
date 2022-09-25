@@ -1,5 +1,6 @@
 package com.cleanup.todoc.ui.utils;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -145,6 +146,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
          *
          * @param task the task to bind in the item view
          */
+        @SuppressLint("RestrictedApi")
         void bind(Task task) {
             lblTaskName.setText(task.getName());
             imgDelete.setTag(task);

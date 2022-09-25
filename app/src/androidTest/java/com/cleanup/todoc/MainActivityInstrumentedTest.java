@@ -9,15 +9,15 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.cleanup.todoc.TestUtils.withRecyclerView;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.junit.Assert.assertThat;
+
 
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.runner.AndroidJUnit4;
@@ -25,11 +25,11 @@ import androidx.test.runner.AndroidJUnit4;
 import com.cleanup.todoc.data.AppDatabase;
 import com.cleanup.todoc.ui.MainActivity;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 
 @RunWith(AndroidJUnit4.class)
 public class MainActivityInstrumentedTest {
@@ -39,15 +39,9 @@ public class MainActivityInstrumentedTest {
 
     @Before
     public void setUp() {
-        Intents.init();
         mActivityRule.getScenario().onActivity(activity -> mActivity = activity);
         ViewMatchers.assertThat(mActivity, notNullValue());
 
-    }
-
-    @After
-    public void tearDown() {
-        Intents.release();
     }
 
     @Test
@@ -56,7 +50,7 @@ public class MainActivityInstrumentedTest {
         RecyclerView listTasks = mActivity.findViewById(R.id.list_tasks);
 
         onView(withId(R.id.fab_add_task)).perform(click());
-        onView(withId(R.id.txt_task_name)).perform(replaceText("Tâche example"));
+        onView(withId(R.id.txt_task_name)).perform(replaceText("Tache example"));
         onView(withId(android.R.id.button1)).perform(click());
 
         // Check that lblTask is not displayed anymore
