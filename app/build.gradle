@@ -12,7 +12,21 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
+    signingConfigs {
+        release {
+            keyAlias "production"
+            keyPassword "123456"
+            storeFile file('./etc/production.keystore')
+            storePassword "123456"
+        }
+        debug {
+            keyAlias 'debug'
+            keyPassword 'android'
+            storeFile file('./etc/debug.keystore')
+            storePassword 'android'
+        }
 
+    }
     testOptions {
         execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
@@ -53,7 +67,9 @@ dependencies {
 
     androidTestImplementation 'androidx.test:runner:1.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation('androidx.test.espresso:espresso-contrib:3.4.0') {
+        exclude module: "protobuf-lite"
+    }
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
 
