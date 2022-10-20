@@ -46,14 +46,6 @@ public class MainRepository {
     }
 
     @WorkerThread
-    public void updateDataBase(ArrayList<Task> tasks) {
-        for (Task task : tasks
-        ) {
-            taskDao.insert((new TaskData(task.getName(), task.getProjectId(), task.getCreationTimestamp())));
-        }
-    }
-
-    @WorkerThread
     public void addTaskToDataBase(Task task){
         taskDao.insert((new TaskData(task.getName(), task.getProjectId(), task.getCreationTimestamp())));
     }

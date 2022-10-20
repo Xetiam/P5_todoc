@@ -2,7 +2,6 @@ package com.cleanup.todoc.model;
 
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -27,7 +26,7 @@ public class Task {
      * The name of the task
      */
     // Suppress warning because setName is called in constructor
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings("NotNullFieldNotInitialized")
     @NonNull
     private String name;
 

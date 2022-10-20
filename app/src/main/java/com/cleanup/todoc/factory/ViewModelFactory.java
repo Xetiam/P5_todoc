@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 
 public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private static ViewModelFactory viewModelFactory;
+    private static volatile ViewModelFactory viewModelFactory;
 
     private final MainRepository mainRepository;
 
@@ -42,9 +42,11 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         return viewModelFactory;
     }
 
+    @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
+            //noinspection unchecked
             return (T) new MainViewModel(mainRepository, ioExecutor);
         }
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());

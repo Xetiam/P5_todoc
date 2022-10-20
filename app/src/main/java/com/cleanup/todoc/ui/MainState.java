@@ -11,7 +11,7 @@ public class MainState {
 class MainStateWithNoProjects extends MainState{
 }
 class MainStateWithProjects extends MainState{
-    private Project[] projects;
+    private final Project[] projects;
     public MainStateWithProjects(Project[] projects){
         this.projects = projects;
     }
@@ -21,7 +21,7 @@ class MainStateWithProjects extends MainState{
     }
 }
 class MainStateWithTasks extends MainState {
-    private ArrayList<Task> tasks;
+    private final ArrayList<Task> tasks;
     public MainStateWithTasks(ArrayList<Task> tasks){
         this.tasks = tasks;
     }
@@ -34,9 +34,9 @@ class MainStateWithTasks extends MainState {
 class MainStateWithNoTasks extends MainState {
 }
 class MainStateOnCreate extends MainState {
-    private Boolean isOnError;
-    private DialogDismissCallBack callBack;
-    private ArrayList<Task> tasks;
+    private final Boolean isOnError;
+    private final DialogDismissCallBack callBack;
+    private final ArrayList<Task> tasks;
 
 
     MainStateOnCreate(Boolean isOnError, DialogDismissCallBack callBack, ArrayList<Task> tasks){

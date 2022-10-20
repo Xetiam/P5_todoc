@@ -14,7 +14,6 @@ import com.cleanup.todoc.ui.utils.MainRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Executor;
 
 public class MainViewModel extends ViewModel {
@@ -33,7 +32,7 @@ public class MainViewModel extends ViewModel {
     private ArrayList<Task> mTasks = new ArrayList<>();
     private Project[] mProjects;
 
-    public MainViewModel(MainRepository repository, Executor ioExecutor) {
+    public MainViewModel(@NonNull MainRepository repository, @NonNull Executor ioExecutor) {
         mRepository = repository;
         mIoExecutor = ioExecutor;
     }
@@ -141,11 +140,6 @@ public class MainViewModel extends ViewModel {
             this._state.postValue(new MainStateOnCreate(false, callBack, mTasks));
         }
     }
-
-    public void getProjects() {
-        mIoExecutor.execute(() -> mRepository.getProject());
-    }
-
 
     /**
      * List of all possible sort methods for task

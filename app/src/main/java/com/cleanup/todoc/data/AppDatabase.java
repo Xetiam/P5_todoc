@@ -12,7 +12,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static final String DATABASE_NAME = "task_database";
 
-    private static AppDatabase sInstance;
+    private static volatile AppDatabase sInstance;
 
     public static AppDatabase getInstance(
             @NonNull Context application

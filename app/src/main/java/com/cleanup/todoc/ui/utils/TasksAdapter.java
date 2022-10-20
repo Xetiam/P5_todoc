@@ -28,7 +28,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
      */
     @NonNull
     private List<Task> tasks;
-    private Project[] projects;
+    private final Project[] projects;
 
     /**
      * The listener for when a task needs to be deleted
@@ -52,6 +52,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
      *
      * @param tasks the list of tasks the adapter deals with to set
      */
+    @SuppressLint("NotifyDataSetChanged")
     public void updateTasks(@NonNull final List<Task> tasks) {
         this.tasks = tasks;
         notifyDataSetChanged();

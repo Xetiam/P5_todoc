@@ -5,8 +5,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.Objects;
-
 @Entity
 public class ProjectData {
     @PrimaryKey(autoGenerate = true)

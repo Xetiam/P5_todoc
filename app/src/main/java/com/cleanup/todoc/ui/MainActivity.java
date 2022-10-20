@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,6 +33,7 @@ import java.util.Objects;
  *
  * @author Gaëtan HERFRAY
  */
+@SuppressWarnings("NotNullFieldNotInitialized")
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
     /**
      * Dialog to create a new task
@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * The RecyclerView which displays the list of tasks
      */
     // Suppress warning is safe because variable is initialized in onCreate
-    @SuppressWarnings("NullableProblems")
     @NonNull
     private Project[] allProjects;
     private RecyclerView listTasks;
@@ -68,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * The TextView displaying the empty state
      */
     // Suppress warning is safe because variable is initialized in onCreate
-    @SuppressWarnings("NullableProblems")
     @NonNull
     private TextView lblNoTasks;
 
@@ -98,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         if(mainState instanceof MainStateOnCreate){
             MainStateOnCreate state = (MainStateOnCreate) mainState;
             if(state.getOnError()){
-                dialogEditText.setError(getString(R.string.empty_task_name));
+                Objects.requireNonNull(dialogEditText).setError(getString(R.string.empty_task_name));
             }
             else{
                 state.getCallBack().dismissDialog();
@@ -112,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
     private void renderStateTask(MainState mainState) {
         if(mainState instanceof MainStateWithNoTasks){
-            MainStateWithNoTasks state = (MainStateWithNoTasks) mainState;
             adapter = new TasksAdapter(new ArrayList<>(), this, allProjects);
             lblNoTasks.setVisibility(View.VISIBLE);
             listTasks.setVisibility(View.GONE);
